@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ult Rank Events This Weekend</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <h1>Ult Rank Events This Weekend!</h1>
+    <div id="board"></div>
+
+    <template id="event-template">
+        <section class="event">
+            <header>
+                <img class="flag">
+                <h2 class="name"></h2>
+                <span class="tier"></span>
+            </header>
+            <ul class="players"></ul>
+        </section>
+    </template>
+
+    <template id="player-template">
+        <li class="player"><img class="player-flag"><span class="mains"></span><span class="tag"></span><span class="rank"></span></li>
+    </template>
+</body>
+</html>

@@ -1,0 +1,12 @@
+query GetCharacters($id: ID!) {
+  videogame(id: $id) {
+    characters {
+      id
+      name
+      images {
+        url
+        type
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from player_data.startgg import DATA_DIR, weekend_window, fetch_tournaments, filter_events, save_tournaments
 from player_data.tier import tier_event
+from player_data.players import add_player_metadata
 
 SECONDS_BETWEEN_FETCHES = 4 
 
@@ -43,17 +44,20 @@ def save_tiered_events(events, path=DATA_DIR / "merged_and_tiered.json"):
         json.dump(events, f, indent=2, ensure_ascii=False)
 
 def main():
+    print("Beginning startgg discovery...")
     thursday, monday = weekend_window()
     tournaments = filter_events(fetch_tournaments(thursday, monday), thursday, monday)
     save_tournaments(tournaments)
-    print(len(tournaments), "tournaments found from startgg discovery with more than 32 entrants this weekend")
+    print(len(tournaments), "tournaments found from startgg discovery")
     events = tier_all_events(tournaments)
+    print(len(events), "events tiered and merged")
+    print("Now fetching player metadata...")
+    add_player_metadata(events)
     save_tiered_events({
         "window": {"start": thursday.isoformat(), "end": monday.isoformat()},
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "events": events,
     })
-    print(len(events), "events tiered and saved to merged_and_tiered.json")
 
 if __name__ == "__main__":
     main()

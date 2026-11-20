@@ -1,8 +1,10 @@
 requests>=2.33
 python-dotenv>=1.2
 tzdata>=2026.5
+pycountry>=24.6
 
 # kenniky's ultrank-scoring (vendor/ultrank-scoring)
 geopy>=2.5
 dateparser>=1.5
 Levenshtein>=0.27
+

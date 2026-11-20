@@ -1,0 +1,38 @@
+query GetPlayer($id: ID!, $perPage: Int) {
+  player(id: $id) {
+    user {
+      location {
+        country
+      }
+    }
+    sets(perPage: $perPage, page: 1) {
+      nodes {
+        event {
+          videogame {
+            id
+          }
+        }
+        slots {
+          entrant {
+            id
+            participants {
+              player {
+                id
+              }
+            }
+          }
+        }
+        games {
+          selections {
+            entrant {
+              id
+            }
+            character {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+}
