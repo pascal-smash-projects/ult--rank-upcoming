@@ -1,0 +1,31 @@
+query GetEvents($page: Int, $after: Timestamp, $before: Timestamp) {
+  tournaments(
+    query: {perPage: 20, page: $page, filter: {afterDate: $after, beforeDate: $before, videogameIds: [1386]}}
+  ) {
+    pageInfo {
+      totalPages
+    }
+    nodes {
+      name
+      city
+      countryCode
+      startAt
+      endAt
+      slug
+      events(filter: {videogameId: [1386]}) {
+        slug
+        name
+        numEntrants
+        startAt
+        isOnline
+        videogame {
+          name
+        }
+      }
+      timezone
+      images(type: "profile") {
+        url
+      }
+    }
+  }
+}
