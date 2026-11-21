@@ -64,6 +64,15 @@ function buildEvent(event) {
     return block;
 }
 
+function renderDates(range) {
+    const el = document.querySelector(".dates");
+    if (!el || !range) return;
+    const start = new Date(`${range.start}T00:00`);
+    const end = new Date(`${range.end}T00:00`);
+    const fmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
+    el.textContent = fmt.formatRange(start, end);
+}
+
 // one combined graphic for the weekend (single_card.html)
 function renderBoard(data) {
     const board = document.getElementById("board");
@@ -83,6 +92,7 @@ function renderCards(data) {
 // each page has its own container, which decides the layout
 loadData()
     .then(data => {
+        renderDates(data.window);
         if (document.getElementById("board")) renderBoard(data);
         if (document.getElementById("cards")) renderCards(data);
     })

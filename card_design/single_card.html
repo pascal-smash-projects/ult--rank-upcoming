@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ult Rank Events This Weekend</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800&family=Yellowtail&family=Kaushan+Script&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>Ult Rank Events This Weekend!</h1>
+    <div class="header" id="sc-header">
+        <img class="banner" id="sc-banner" src="assets/ultrank-2026-banner.png">
+        <div class="title">
+            <h1>Upcoming This Weekend</h1>
+            <h3 class="dates"></h3>
+        </div>
+    </div>
     <div id="board"></div>
 
     <template id="event-template">

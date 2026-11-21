@@ -1,0 +1,71 @@
+  :root {
+    --page: #1b0f24;
+    --ink: #f6eefc;
+    --muted: #b9a6c9;
+    --plum-900: #1f0b2b;
+    --plum-800: #2c1238;
+    --plum-700: #3d1a4d;
+    --plum-600: #552468;
+    --orange: #e8875b;
+    --orange-soft: #f3a77f;
+    --cell: #f7f3fa;
+    --cell-ink: #1d1424;
+
+    --tier-P:  #b36bff;
+    --tier-Sp: #ff6fb4;
+    --tier-S:  #ff6b6b;
+    --tier-Ap: #ff9a4d;
+    --tier-A:  #ffbf7a;
+    --tier-Bp: #f5c518;
+    --tier-B:  #ffe45c;
+    --tier-C:  #5ee38a;
+  }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  background-color: var(--plum-800);
+  border-bottom: 3px solid var(--orange);
+}
+           
+.header h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Kaushan Script", cursive;
+  font-weight: 400;
+  font-size: 5vw;
+  white-space: nowrap;
+  line-height: 1;
+  letter-spacing: .5px;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+}
+
+.header h3 {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-family: "Kaushan Script", cursive;
+  font-weight: 400;
+  font-size: 2vw;
+}
+
+
+#sc-banner {        
+  width: 50%;
+  min-width: 140px;
+  height: auto;
+}
