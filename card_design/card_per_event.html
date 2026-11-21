@@ -3,27 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ult Rank Events This Weekend</title>
+    <title>Ult Rank Event Cards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700;800&family=Kaushan+Script&display=swap" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>Ult Rank Events This Weekend!</h1>
-    <div id="cards"></div>
+    <button id="download" class="download-btn" type="button">Download PNGs</button>
 
-    <template id="event-template">
-        <article class="card">
-            <header>
-                <img class="flag">
-                <h2 class="name"></h2>
-                <span class="tier"></span>
-            </header>
-            <ul class="players"></ul>
+    <main id="cards" class="card-page"></main>
+
+    <template id="card-template">
+        <article class="event-card">
+            <div class="card-head">
+                <img class="banner" src="assets/ultrank-2026-banner.png" alt="UltRank 2026, powered by start.gg">
+                <div class="card-id">
+                    <img class="logo" alt="">
+                    <div class="event-id">
+                        <span class="name"></span>
+                        <div class="event-meta">
+                            <span class="tier-pill"></span>
+                            <img class="flag">
+                            <span class="meta"></span>
+                        </div>
+                        <span class="dates"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body players"></div>
+            <div class="board-foot">
+                <em>Get featured on this graphic: patreon.com/UltRank</em>
+                <span>Data sourced from start.gg</span>
+            </div>
         </article>
     </template>
 
+    <template id="event-template">
+        <div class="event">
+            <div class="event-head">
+                <img class="logo" alt="">
+                <div class="event-id">
+                    <span class="name"></span>
+                    <div class="event-meta">
+                        <span class="tier-pill"></span>
+                        <img class="flag">
+                        <span class="meta"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="players"></div>
+        </div>
+    </template>
+
     <template id="player-template">
-        <li class="player"><img class="player-flag"><span class="mains"></span><span class="tag"></span><span class="rank"></span></li>
+        <div class="chip">
+            <span class="rank"></span>
+            <img class="player-flag">
+            <span class="tag"></span>
+            <span class="mains"></span>
+        </div>
     </template>
 </body>
 </html>

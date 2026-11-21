@@ -4,6 +4,7 @@ const TIER_ORDER = ["P", "S+", "S", "A+", "A", "B+", "B", "C"];
 const TIER_COLOUR = { P: "--tier-P", "S+": "--tier-Sp", S: "--tier-S", "A+": "--tier-Ap", A: "--tier-A",
     "B+": "--tier-Bp", B: "--tier-B", C: "--tier-C" };
 const MAJOR_TIERS = new Set(["P", "S+", "S", "A+", "A"]);
+const GROUPED_TIER = "C";
 
 const PLAYER_LIMIT = { major: 80, other: 30 };
 const BOARD_COLUMNS = 3;
@@ -12,7 +13,8 @@ const TRAVELLER_WIDTH = 290;
 // pre local filter
 const PRELOCAL = /\bpre\b|\b(pre-?)?locals?\b/i;
 
-let downloadName = "ultrank-upcoming.png";
+let weekStart = "";
+
 async function loadData() {
     if (location.protocol === "file:") {
         throw new Error("Open this page through a server (python -m http.server), not by double-clicking it.");
@@ -26,6 +28,12 @@ async function loadData() {
 
 function isPrelocal(event) {
     return PRELOCAL.test(event.tournament ?? "") || PRELOCAL.test(event.event ?? "");
+}
+
+function selectEvents(data) {
+    return (data.events ?? [])
+        .filter(event => TIER_ORDER.includes(event.tier) && !isPrelocal(event))
+        .sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
 }
 
 function byRank(a, b) {
@@ -51,6 +59,10 @@ function div(className, ...children) {
     return el;
 }
 
+function fromTemplate(id) {
+    return document.getElementById(id).content.firstElementChild.cloneNode(true);
+}
+
 function setFlag(img, country) {
     if (!img) return;
     if (country) {
@@ -60,8 +72,9 @@ function setFlag(img, country) {
         img.remove();
     }
 }
+
 function buildPlayer(player) {
-    const row = document.getElementById("player-template").content.cloneNode(true);
+    const row = fromTemplate("player-template");
 
     row.querySelector(".tag").textContent = player.tag;
     setFlag(row.querySelector(".player-flag"), player.country);
@@ -97,6 +110,7 @@ function countryHeading(code) {
     setFlag(flag, code);
     return heading;
 }
+
 function packIntoColumns(container, items, count) {
     const columns = Array.from({ length: count }, () => div("col"));
     container.replaceChildren(...columns);
@@ -105,6 +119,13 @@ function packIntoColumns(container, items, count) {
         const shortest = columns.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a));
         shortest.append(item);
     }
+}
+
+function packTravellers(card) {
+    const travellers = card.querySelector(".travellers");
+    if (!travellers) return;
+    const count = Math.max(1, Math.floor(travellers.clientWidth / TRAVELLER_WIDTH));
+    packIntoColumns(travellers, [...travellers.children], count);
 }
 
 function fillEventHeader(card, event) {
@@ -120,6 +141,7 @@ function fillEventHeader(card, event) {
     if (event.logo_url) logo.src = event.logo_url;
     else logo.remove();
 }
+
 function addMajorPlayers(body, players, homeCountry) {
     const home = players.filter(p => p.country === homeCountry);
     if (home.length) body.append(countryHeading(homeCountry), playerList(home, false));
@@ -138,34 +160,27 @@ function addMajorPlayers(body, players, homeCountry) {
     body.append(travellers);
 }
 
-function buildBoardEvent(event) {
-    const card = document.getElementById("event-template").content.firstElementChild.cloneNode(true);
+function addPlayers(body, event) {
     const major = MAJOR_TIERS.has(event.tier);
-    fillEventHeader(card, event);
-
     const all = [...(event.players ?? [])].sort(byRank);
     const shown = all.slice(0, major ? PLAYER_LIMIT.major : PLAYER_LIMIT.other);
-    const body = card.querySelector(".players");
 
     if (major) addMajorPlayers(body, shown, event.country);
     else body.append(playerList(shown, true));
 
     const hidden = all.length - shown.length;
     if (hidden > 0) body.append(div("more", `+${hidden} more`));
-    return card;
-}
-function packTravellers(card) {
-    const travellers = card.querySelector(".travellers");
-    if (!travellers) return;
-    const count = Math.max(1, Math.floor(travellers.clientWidth / TRAVELLER_WIDTH));
-    packIntoColumns(travellers, [...travellers.children], count);
 }
 
-function renderBoard(data) {
+function buildBoardEvent(event) {
+    const card = fromTemplate("event-template");
+    fillEventHeader(card, event);
+    addPlayers(card.querySelector(".players"), event);
+    return card;
+}
+
+function renderBoard(events) {
     const board = document.getElementById("board");
-    const events = (data.events ?? [])
-        .filter(event => TIER_ORDER.includes(event.tier) && !isPrelocal(event))
-        .sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
     for (const event of events.filter(e => MAJOR_TIERS.has(e.tier))) {
         const card = buildBoardEvent(event);
         board.append(card);
@@ -179,51 +194,81 @@ function renderBoard(data) {
     }
 }
 
+function buildCard(event) {
+    const card = fromTemplate("card-template");
+    card.classList.add("export", MAJOR_TIERS.has(event.tier) ? "major-card" : "small-card");
+    fillEventHeader(card, event);
+    addPlayers(card.querySelector(".players"), event);
+    return card;
+}
+
+function buildGroupCard(tier, count) {
+    const card = fromTemplate("card-template");
+    card.classList.add("export", "group-card");
+    card.style.setProperty("--tier", `var(${TIER_COLOUR[tier]})`);
+    card.querySelector(".tier-pill").textContent = tier;
+    card.querySelector(".name").textContent = `${tier} Tier`;
+    card.querySelector(".meta").textContent = `${count} events`;
+    card.querySelector(".flag").remove();
+    card.querySelector(".logo").remove();
+    return card;
+}
+
+function renderCards(events) {
+    const cards = document.getElementById("cards");
+    for (const event of events.filter(e => e.tier !== GROUPED_TIER)) {
+        const card = buildCard(event);
+        cards.append(card);
+        packTravellers(card);
+    }
+
+    const grouped = events.filter(e => e.tier === GROUPED_TIER);
+    if (grouped.length) {
+        const card = buildGroupCard(GROUPED_TIER, grouped.length);
+        const grid = div("packed");
+        card.querySelector(".players").append(grid);
+        cards.append(card);
+        packIntoColumns(grid, grouped.map(buildBoardEvent), BOARD_COLUMNS);
+    }
+}
+
 function renderDates(range) {
-    const el = document.querySelector(".dates");
-    if (!el || !range) return;
+    if (!range) return;
     const start = new Date(`${range.start}T00:00`);
     const end = new Date(`${range.end}T00:00`);
     const format = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
-    el.textContent = format.formatRange(start, end);
-}
-
-function buildEvent(event) {
-    const block = document.getElementById("event-template").content.cloneNode(true);
-
-    block.querySelector(".name").textContent = event.tournament;
-    block.querySelector(".tier").textContent = event.tier ?? "";
-    setFlag(block.querySelector(".flag"), event.country);
-
-    const players = block.querySelector(".players");
-    for (const player of event.players ?? []) {
-        players.append(buildPlayer(player));
-    }
-    return block;
-}
-
-function renderCards(data) {
-    const cards = document.getElementById("cards");
-    for (const event of data.events) {
-        cards.append(buildEvent(event));
+    for (const el of document.querySelectorAll(".dates")) {
+        el.textContent = format.formatRange(start, end);
     }
 }
 
-async function downloadPng() {
+function fileName(index, total) {
+    const base = weekStart ? `ultrank-upcoming-${weekStart}` : "ultrank-upcoming";
+    return total > 1 ? `${base}-${String(index + 1).padStart(2, "0")}.png` : `${base}.png`;
+}
+
+async function savePng(element, name) {
+    const url = await htmlToImage.toPng(element, {
+        pixelRatio: 2,
+        style: { margin: "0" },
+        backgroundColor: getComputedStyle(document.body).backgroundColor,
+    });
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = name;
+    link.click();
+}
+
+async function downloadAll() {
     const button = document.getElementById("download");
     const label = button.textContent;
+    const targets = [...document.querySelectorAll(".export")];
     button.disabled = true;
-    button.textContent = "Rendering…";
     try {
-        const url = await htmlToImage.toPng(document.querySelector(".canvas"), {
-            pixelRatio: 2,
-            style: { margin: "0" },
-            backgroundColor: getComputedStyle(document.body).backgroundColor,
-        });
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = downloadName;
-        link.click();
+        for (const [i, target] of targets.entries()) {
+            button.textContent = `Rendering ${i + 1}/${targets.length}…`;
+            await savePng(target, fileName(i, targets.length));
+        }
     } catch (error) {
         console.error(error);
         alert(`Couldn't make the PNG: ${error.message ?? error}`);
@@ -236,17 +281,18 @@ async function downloadPng() {
 async function main() {
     try {
         const data = await loadData();
-        renderDates(data.window);
-        if (data.window?.start) downloadName = `ultrank-upcoming-${data.window.start}.png`;
+        weekStart = data.window?.start ?? "";
         await document.fonts.ready;
 
-        if (document.getElementById("board")) renderBoard(data);
-        if (document.getElementById("cards")) renderCards(data);
+        const events = selectEvents(data);
+        if (document.getElementById("board")) renderBoard(events);
+        if (document.getElementById("cards")) renderCards(events);
+        renderDates(data.window);
     } catch (error) {
         console.error(error);
         document.body.prepend(Object.assign(document.createElement("p"), { textContent: error.message }));
     }
 }
 
-document.getElementById("download")?.addEventListener("click", downloadPng);
+document.getElementById("download")?.addEventListener("click", downloadAll);
 main();
