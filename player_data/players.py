@@ -49,7 +49,10 @@ def get_mains(player, player_id, characters):
         picks.update(sel["character"]["id"] for game in s["games"] or [] for sel in game["selections"] or []
                      if sel["character"] and sel["entrant"]["id"] in mine)
     total = sum(picks.values())
-    return [characters[c] for c, n in picks.most_common(3) if n / total >= 0.1]
+    top = [(c, n) for c, n in picks.most_common() if n / total >= 0.1]
+    # random only counts when its someones most common char
+    top = top[:1] + [(c, n) for c, n in top[1:] if not characters[c]["name"].lower().startswith("random")]
+    return [characters[c] for c, n in top[:3]]
 
 
 # start.gg country names that pycountry doesn't know; GB nations use flagcdn's gb-eng style codes
