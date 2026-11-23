@@ -82,22 +82,22 @@ body {
   color: var(--orange-soft);
 }
 
-.nav-buttons button {
+.nav-buttons a {
   width: 360px;
   padding: 10px 20px;
   font: 700 20px "Barlow Condensed", sans-serif;
   letter-spacing: .4px;
+  text-align: center;
+  text-decoration: none;
   color: var(--ink);
-  background: none;
   border: 2px solid var(--plum-600);
-  cursor: pointer;
 }
 
-.nav-buttons button:hover {
+.nav-buttons a:hover {
   border-color: var(--orange);
 }
 
-.nav-buttons button:focus-visible {
+.nav-buttons a:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
