@@ -1,4 +1,4 @@
-const DATA_URL = "../data/merged_and_tiered.json";
+const DATA_URL = "/data/merged_and_tiered.json";
 
 const TIER_ORDER = ["P", "S+", "S", "A+", "A", "B+", "B", "C"];
 const TIER_COLOUR = { P: "--tier-P", "S+": "--tier-Sp", S: "--tier-S", "A+": "--tier-Ap", A: "--tier-A",

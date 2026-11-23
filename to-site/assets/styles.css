@@ -59,6 +59,49 @@ body {
   cursor: wait;
 }
 
+.landing {
+  display: flex;
+  flex-direction: column;
+  height: 900px;
+}
+
+.nav-buttons {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 24px;
+}
+
+.nav-buttons h3 {
+  margin: 0 0 4px;
+  font: 700 28px "Barlow Condensed", sans-serif;
+  letter-spacing: .4px;
+  color: var(--orange-soft);
+}
+
+.nav-buttons button {
+  width: 360px;
+  padding: 10px 20px;
+  font: 700 20px "Barlow Condensed", sans-serif;
+  letter-spacing: .4px;
+  color: var(--ink);
+  background: none;
+  border: 2px solid var(--plum-600);
+  cursor: pointer;
+}
+
+.nav-buttons button:hover {
+  border-color: var(--orange);
+}
+
+.nav-buttons button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 .header {
   display: flex;
   align-items: center;
