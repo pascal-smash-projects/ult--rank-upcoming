@@ -5,7 +5,8 @@ async function initEditPage() {
     const countries = await loadCountries();
     const characters = await fetchJson("/assets/characters.json");
     const overrides = await fetchJson("/data/player_overrides.json").catch(() => ({}));
-    document.getElementById("event-list").append(...(data.events ?? []).map(event => buildEventRow(event, countries)));}
+    document.getElementById("event-list").append(...(data.events ?? []).map(event => buildEventRow(event, countries, characters)));
+}
 
 async function fetchJson(url) {
     const response = await fetch(url, { cache: "no-store" });
@@ -21,7 +22,7 @@ async function loadCountries() {
         .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function buildEventRow(event, countries) {
+function buildEventRow(event, countries, characters) {
     const row = fromTemplate("event-row-template");
     row.dataset.slug = event.slug;
     row.style.setProperty("--tier", `var(${TIER_COLOUR[event.tier] ?? "--muted"})`);
@@ -35,7 +36,52 @@ function buildEventRow(event, countries) {
     fields.querySelector('[name="entrants"]').value = event.entrants ?? "";
     fillCountrySelect(countries, fields.querySelector(".country-select"), event.country);
     fillTierSelect(fields, event.tier);
+    const limit = MAJOR_TIERS.has(event.tier) ? PLAYER_LIMIT.major : PLAYER_LIMIT.other;
+    const players = [...(event.players ?? [])].sort(byRank);
+    row.querySelector(".player-list").append(
+        ...players.map((p, i) => buildPlayerRow(p, i < limit, countries, characters))
+    );
     return row;
+}
+
+function buildPlayerRow(player, shown, countries, characters) {
+    const row = fromTemplate("player-row-template");
+    row.dataset.id = player.startgg_id;
+    row.querySelector(".show-toggle").checked = shown;
+    row.querySelector(".rank").textContent = player.rank != null ? `#${player.rank}` : "-";
+    row.querySelector(".tag").textContent = player.tag;
+    const fields = row.querySelector(".player-fields");
+    fields.querySelector('[name="tag"]').value = player.tag ?? "";
+    fields.querySelector('[name="rank"]').value = player.rank ?? "";
+    fillCountrySelect(countries, fields.querySelector(".country-select"), player.country);
+    fields.querySelectorAll('[name="main"]').forEach((select, i) => {
+        select.replaceChildren(new Option("-", ""), ...characters.map(c => new Option(c.name, c.name)));
+        select.value = player.mains?.[i]?.name ?? "";
+    });
+    const updateSummary = () => updatePlayerSummary(row, characters);
+    fields.addEventListener("change", updateSummary);
+    updateSummary();
+    return row;
+}
+
+function updatePlayerSummary(row, characters) {
+    const country = row.querySelector('.player-fields [name="country"]').value;
+    const flag = row.querySelector(".player-summary .player-flag");
+    flag.hidden = !country;
+    if (country) {
+        flag.src = `https://flagcdn.com/${country.toLowerCase()}.svg`;
+        flag.alt = country;
+    }
+
+    const mainNames = [...row.querySelectorAll('.player-fields [name="main"]')]
+        .map(select => select.value)
+        .filter(Boolean);
+    row.querySelector(".player-summary .mains").replaceChildren(...mainNames.map(name => {
+        const icon = document.createElement("img");
+        icon.src = characters.find(c => c.name === name)?.icon_url ?? "";
+        icon.alt = icon.title = name;
+        return icon;
+    }));
 }
 
 function fillCountrySelect(countries, container, code) {
