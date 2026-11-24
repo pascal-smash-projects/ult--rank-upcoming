@@ -1,10 +1,10 @@
 const DATA_URL = "/data/merged_and_tiered.json";
 
-const TIER_ORDER = ["P", "S+", "S", "A+", "A", "B+", "B", "C"];
+const TIER_ORDER = ["P", "S+", "S", "A+", "A", "B+", "B", "C", "D"];
 const TIER_COLOUR = { P: "--tier-P", "S+": "--tier-Sp", S: "--tier-S", "A+": "--tier-Ap", A: "--tier-A",
-    "B+": "--tier-Bp", B: "--tier-B", C: "--tier-C" };
+    "B+": "--tier-Bp", B: "--tier-B", C: "--tier-C", D: "--muted" };
 const MAJOR_TIERS = new Set(["P", "S+", "S", "A+", "A"]);
-const GROUPED_TIER = "C";
+const GROUPED_TIERS = ["C", "D"];
 
 const PLAYER_LIMIT = { major: 80, other: 30 };
 const BOARD_COLUMNS = 3;
@@ -46,7 +46,7 @@ const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 function countryName(code) {
     if (!code) return "Other";
     try {
-        return regionNames.of(code.toUpperCase()) ?? code;
+        return regionNames.of(code) ?? code;
     } catch {
         return code;
     }
@@ -66,6 +66,7 @@ function fromTemplate(id) {
 function setFlag(img, country) {
     if (!img) return;
     if (country) {
+        img.crossOrigin = "anonymous";
         img.src = `https://flagcdn.com/${country.toLowerCase()}.svg`;
         img.alt = country;
     } else {
@@ -86,6 +87,7 @@ function buildPlayer(player) {
     const mains = row.querySelector(".mains");
     for (const main of player.mains ?? []) {
         const icon = document.createElement("img");
+        icon.crossOrigin = "anonymous";
         icon.src = main.icon_url;
         icon.alt = icon.title = main.name;
         mains.append(icon);
@@ -138,6 +140,7 @@ function fillEventHeader(card, event) {
     setFlag(card.querySelector(".flag"), event.country);
 
     const logo = card.querySelector(".logo");
+    logo.crossOrigin = "anonymous";
     if (event.logo_url) logo.src = event.logo_url;
     else logo.remove();
 }
@@ -216,15 +219,17 @@ function buildGroupCard(tier, count) {
 
 function renderCards(events) {
     const cards = document.getElementById("cards");
-    for (const event of events.filter(e => e.tier !== GROUPED_TIER)) {
+    const groupedCount = tier => events.filter(e => e.tier === tier).length;
+    for (const event of events.filter(e => !GROUPED_TIERS.includes(e.tier) || groupedCount(e.tier) === 1)) {
         const card = buildCard(event);
         cards.append(card);
         packTravellers(card);
     }
 
-    const grouped = events.filter(e => e.tier === GROUPED_TIER);
-    if (grouped.length) {
-        const card = buildGroupCard(GROUPED_TIER, grouped.length);
+    for (const tier of GROUPED_TIERS) {
+        const grouped = events.filter(e => e.tier === tier);
+        if (grouped.length < 2) continue;
+        const card = buildGroupCard(tier, grouped.length);
         const grid = div("packed");
         card.querySelector(".players").append(grid);
         cards.append(card);

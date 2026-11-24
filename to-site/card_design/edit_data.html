@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ult Rank Edit Data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700;800&family=Kaushan+Script&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="assets/script.js" defer></script>
+    <script src="assets/edit_data.js" defer></script>
+</head>
+<body>
+    <main class="canvas edit-page">
+        <div class="header">
+            <img class="banner" src="assets/ultrank-2026-banner.png" alt="UltRank 2026, powered by start.gg">
+            <div class="title">
+                <h1>Upcoming this weekend</h1>
+                <h3 class="dates"></h3>
+            </div>
+        </div>
+
+        <div class="return-home-button">
+            <a href="/">Back to Home</a>
+        </div>
+
+        <div id="edit-form">
+            <h3>Edit Data</h3>
+            <form class="edit-form">
+                <ul id="event-list" class="event-list"></ul>
+                <button id="add-event" class="add-btn" type="button">Add event</button>
+                <div class="form-actions">
+                    <button class="save-btn" type="submit">Save changes</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="board-foot">
+            <em>Website built by Pascal!</em>
+            <span>Follow me on twitter @pascal345_</span>
+        </div>
+    </main>
+
+    <template id="event-row-template">
+        <li class="event-row">
+            <input class="show-toggle" type="checkbox" aria-label="Show on graphic">
+            <details>
+                <summary class="event-summary">
+                    <span class="tier-pill"></span>
+                    <span class="name"></span>
+                </summary>
+                <div class="event-fields">
+                    <label class="field">
+                        <span>Tournament</span>
+                        <input type="text" name="tournament">
+                    </label>
+                    <label class="field">
+                        <span>Event</span>
+                        <input type="text" name="event">
+                    </label>
+                    <label class="field">
+                        <span>Tier</span>
+                        <select name="tier"></select>
+                    </label>
+                    <label class="field">
+                        <span>Country</span>
+                        <span class="country-select">
+                            <img class="flag" alt="">
+                            <select name="country"></select>
+                        </span>
+                    </label>
+                    <label class="field">
+                        <span>City</span>
+                        <input type="text" name="city">
+                    </label>
+                    <label class="field">
+                        <span>Entrants</span>
+                        <input type="number" name="entrants" min="0">
+                    </label>
+                </div>
+                <ul class="player-list"></ul>
+                <button class="add-btn add-player" type="button">Add player</button>
+            </details>
+        </li>
+    </template>
+
+    <template id="player-row-template">
+        <li class="player-row">
+            <input class="show-toggle" type="checkbox" aria-label="Show player">
+            <details>
+                <summary class="player-summary">
+                    <span class="rank"></span>
+                    <span class="tag"></span>
+                </summary>
+                <div class="player-fields">
+                    <label class="field">
+                        <span>Tag</span>
+                        <input type="text" name="tag">
+                    </label>
+                    <label class="field">
+                        <span>Country</span>
+                        <span class="country-select">
+                            <img class="flag" alt="">
+                            <select name="country"></select>
+                        </span>
+                    </label>
+                    <label class="field">
+                        <span>UltRank</span>
+                        <input type="number" name="rank" min="1">
+                    </label>
+                    <fieldset class="field field-mains">
+                        <legend>Mains</legend>
+                        <select name="main" aria-label="Main 1"></select>
+                        <select name="main" aria-label="Main 2"></select>
+                        <select name="main" aria-label="Main 3"></select>
+                    </fieldset>
+                </div>
+            </details>
+        </li>
+    </template>
+</body>
+</html>

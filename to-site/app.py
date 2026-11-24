@@ -20,3 +20,7 @@ def single_card(request: Request):
 @app.get("/card-per-event")
 def card_per_event(request: Request):
     return templates.TemplateResponse(request, "card_per_event.html")
+
+@app.get("/edit-data")
+def edit_data(request: Request):
+    return templates.TemplateResponse(request, "edit_data.html")

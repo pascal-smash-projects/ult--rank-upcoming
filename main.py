@@ -14,7 +14,7 @@ def discovery_fields(tournament, event):
         "slug": event["slug"],
         "tournament": tournament["name"],
         "event": event["name"],
-        "country": tournament["countryCode"],
+        "country": (tournament["countryCode"] or "").lower() or None,
         "city": tournament["city"],
         "start_at": event["startAt"],
         "timezone": tournament["timezone"],

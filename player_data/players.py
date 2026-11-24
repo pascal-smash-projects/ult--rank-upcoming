@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 import re
 import time
@@ -57,10 +58,10 @@ def get_mains(player, player_id, characters):
 
 # start.gg country names that pycountry doesn't know; GB nations use flagcdn's gb-eng style codes
 COUNTRY_ALIASES = {
-    "turkey": "TR", "russia": "RU", "korea": "KR", "uk": "GB", "england": "GB-ENG", "scotland": "GB-SCT",
-    "wales": "GB-WLS", "northern ireland": "GB-NIR", "macau": "MO", "kosovo": "XK", "ivory coast": "CI",
-    "palestine": "PS", "brunei": "BN", "cape verde": "CV", "swaziland": "SZ", "macedonia": "MK",
-    "holland": "NL", "the netherlands": "NL",
+    "turkey": "tr", "russia": "ru", "korea": "kr", "uk": "gb", "england": "gb-eng", "scotland": "gb-sct",
+    "wales": "gb-wls", "northern ireland": "gb-nir", "macau": "mo", "kosovo": "xk", "ivory coast": "ci",
+    "palestine": "ps", "brunei": "bn", "cape verde": "cv", "swaziland": "sz", "macedonia": "mk",
+    "holland": "nl", "the netherlands": "nl",
 }
 
 
@@ -71,7 +72,7 @@ def country_code(name):
     if name.lower() in COUNTRY_ALIASES:
         return COUNTRY_ALIASES[name.lower()]
     try:
-        return pycountry.countries.lookup(name).alpha_2
+        return pycountry.countries.lookup(name).alpha_2.lower()
     except LookupError:
         print(f"  unknown country {name!r}")
         return None
@@ -79,10 +80,8 @@ def country_code(name):
 
 def add_player_metadata(events):
     ranks = load_ranks()
-    characters = {
-        c["id"]: {"name": c["name"], "icon_url": next((i["url"] for i in c["images"] if i["type"] == "stockIcon"), None)}
-        for c in run_query("get_characters.graphql", {"id": ULTIMATE_ID})["videogame"]["characters"]
-    }
+    with open(PROJECT_DIR / "to-site" / "assets" / "characters.json", encoding="utf-8") as f:
+        characters = {c["id"]: {"name": c["name"], "icon_url": c["icon_url"]} for c in json.load(f)}
 
     for event in events:
         print(f"Fetching metadata for {len(event.get('players', []))} players at {event['slug']}:")
