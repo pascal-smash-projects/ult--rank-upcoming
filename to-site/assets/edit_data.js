@@ -6,6 +6,13 @@ async function initEditPage() {
     const characters = await fetchJson("/assets/characters.json");
     const overrides = await fetchJson("/data/player_overrides.json").catch(() => ({}));
     document.getElementById("event-list").append(...(data.events ?? []).map(event => buildEventRow(event, countries, characters)));
+    // add event button
+    document.getElementById("add-event").addEventListener("click", () => {
+        const row = buildEventRow(newEvent(), countries, characters);
+        row.querySelector(".show-toggle").checked = true;
+        row.querySelector("details").open = true;
+        document.getElementById("event-list").append(row);
+    });
 }
 
 async function fetchJson(url) {
@@ -41,6 +48,12 @@ function buildEventRow(event, countries, characters) {
     row.querySelector(".player-list").append(
         ...players.map((p, i) => buildPlayerRow(p, i < limit, countries, characters))
     );
+    // add player button
+    row.querySelector(".add-player").addEventListener("click", () => {
+        const newRow = buildPlayerRow(newPlayer(), true, countries, characters);
+        newRow.querySelector("details").open = true;
+        row.querySelector(".player-list").append(newRow);
+    });
     return row;
 }
 
@@ -113,5 +126,14 @@ function fillTierSelect(container, tier) {
     );
     select.value = tier ?? "";
 }
+
+function newPlayer() {
+    return { startgg_id: `custom-${crypto.randomUUID()}`, tag: "New player" };
+}
+
+function newEvent() {
+    return { slug: `custom-${crypto.randomUUID()}`, tournament: "New event" };
+}
+
 
 initEditPage();
